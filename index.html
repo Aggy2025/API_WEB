@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sumobot Monitor</title>
+<title>Sumobot Monitor - Bloques</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -13,14 +13,24 @@
 
 <p id="status" class="text-red-400 mb-4">Desconectado</p>
 
-<button id="connectBtn"
-class="bg-indigo-600 text-white px-6 py-3 rounded-lg mb-4">
+<button id="connectBtn" class="bg-indigo-600 text-white px-6 py-3 rounded-lg mb-4">
 Conectar BLE
 </button>
 
-<div id="log"
-class="bg-gray-900 w-96 h-80 p-4 overflow-y-auto rounded-lg text-sm">
+<div id="log" class="bg-gray-900 w-96 h-48 p-4 overflow-y-auto rounded-lg text-sm mb-4">
 Esperando datos...
+</div>
+
+<h2 class="text-lg mb-2">Secuencia IA recibida:</h2>
+<textarea id="iaSequence" class="w-96 h-24 p-2 mb-4 bg-gray-800 text-white rounded" readonly></textarea>
+
+<button id="executeBtn" class="bg-green-600 text-white px-6 py-2 rounded-lg mb-4">
+Ejecutar Secuencia IA
+</button>
+
+<div id="blocksArea" class="bg-gray-900 w-96 h-32 p-4 overflow-y-auto rounded-lg text-sm">
+<!-- Aquí el usuario podría agregar bloques o secuencias personalizadas -->
+Secuencia personalizada: F,L,R,F
 </div>
 
 <script>
@@ -46,12 +56,24 @@ document.getElementById("connectBtn").onclick = async () => {
 };
 
 function handleData(event) {
-    const value = new TextDecoder().decode(event.target.value);
+    const value = new TextDecoder().decode(event.target.value).trim();
     const logDiv = document.getElementById("log");
+    const iaText = document.getElementById("iaSequence");
 
     logDiv.innerHTML += "<div>> " + value + "</div>";
     logDiv.scrollTop = logDiv.scrollHeight;
+
+    // Guardar última secuencia IA recibida
+    iaText.value = value;
 }
+
+// Simula ejecución de la secuencia
+document.getElementById("executeBtn").onclick = () => {
+    const seq = document.getElementById("iaSequence").value;
+    if(seq){
+        alert("Ejecutando secuencia IA: " + seq + "\n(En el robot real se usaría la función execute)");
+    }
+};
 </script>
 
 </body>
