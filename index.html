@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sumobot IA Monitor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center">
+
+<h1 class="text-3xl font-bold mb-6">🤖 Sumobot IA Monitor</h1>
+
+<p id="status" class="mb-4 text-red-400">Desconectado</p>
+
+<button id="connectBtn"
+class="bg-indigo-600 px-6 py-3 rounded-lg mb-6 hover:bg-indigo-700">
+Conectar por Bluetooth
+</button>
+
+<div class="bg-black p-6 rounded-xl w-96 h-64 overflow-y-auto font-mono text-green-400"
+id="output">
+Esperando datos...
+</div>
+
+<script>
+const UART_SERVICE = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+const UART_RX = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+
+let device, characteristic;
+
+document.getElementById("connectBtn").onclick = async () => {
+    try {
+        device = await navigator.bluetooth.requestDevice({
+            filters: [{ services: [UART_SERVICE] }]
+        });
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService(UART_SERVICE);
+        characteristic = await service.getCharacteristic(UART_RX);
+
+        await characteristic.startNotifications();
+        characteristic.addEventListener('characteristicvaluechanged', handleData);
+
+        document.getElementById("status").textContent = "Conectado a " + device.name;
+        document.getElementById("status").className = "text-green-400 mb-4";
+
+    } catch (error) {
+        alert("Error: " + error);
+    }
+};
+
+function handleData(event) {
+    const value = new TextDecoder().decode(event.target.value);
+
+    const output = document.getElementById("output");
+    output.innerHTML += "<div>> " + value + "</div>";
+    output.scrollTop = output.scrollHeight;
+}
+</script>
+
+</body>
+</html>
